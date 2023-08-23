@@ -1,11 +1,18 @@
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 
-class Location extends StatelessWidget {
-  final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
-  final Position lastPosition = Position(
-      longitude: 2.9,
-      latitude: 3.4,
+class Location extends StatefulWidget {
+  const Location({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _LocationState();
+}
+
+class _LocationState extends State<Location> {
+  final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
+  Position _lastPos = Position(
+      longitude: 0.0,
+      latitude: 0.0,
       timestamp: DateTime.now(),
       accuracy: 0.0,
       altitude: 0.0,
@@ -13,20 +20,24 @@ class Location extends StatelessWidget {
       speed: 0.0,
       speedAccuracy: 0.0);
 
-  Location({super.key});
+  @override
+  void initState() {
+    // _lastPos = await geolocatorPlatform.getCurrentPosition();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      'Lat: ${lastPosition.latitude} Lon: ${lastPosition.longitude}',
-      style:
-          const TextStyle(fontSize: 24, color: Color.fromARGB(255, 74, 11, 11)),
-    );
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      OutlinedButton(onPressed: setCurrentPosition, child: const Text('Push to Locate')),
+      const Padding(padding: EdgeInsets.all(8.0)),
+      Text('Lat: ${_lastPos.latitude} Lon: ${_lastPos.longitude}')
+    ]);
   }
 
-  // Future<void> setCurrentPosition() async =>
-  //     {
-  //       Position pos = await geolocatorPlatform.getCurrentPosition();
-  //       lastPosition.lat
-  //     };
+  Future<void> setCurrentPosition() async {
+    setState(() {});
+
+    _lastPos = await _geolocatorPlatform.getCurrentPosition();
+  }
 }
