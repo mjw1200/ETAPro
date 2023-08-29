@@ -36,4 +36,6 @@ class LocationState extends State<Location> {
     var pos = await _geolocatorPlatform.getCurrentPosition();
     _updates.add(Text('Lat: ${pos.latitude} Lon: ${pos.longitude} Speed: ${pos.speed} Time: ${pos.timestamp}'));
   }
+
+  // test
 }
