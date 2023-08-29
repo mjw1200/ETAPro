@@ -17,7 +17,7 @@ class LocationState extends State<Location> {
   var quackCount = 1;
 
   LocationState() : super() {
-    Timer.periodic(const Duration(milliseconds: 5000), setCurrentPosition);
+    Timer.periodic(const Duration(milliseconds: 15000), setCurrentPosition);
   }
 
   @override
