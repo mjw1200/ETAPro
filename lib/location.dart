@@ -14,10 +14,9 @@ class Location extends StatefulWidget {
 class LocationState extends State<Location> {
   final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
   final List<Text> _updates = [];
-  var quackCount = 1;
 
   LocationState() : super() {
-    Timer.periodic(const Duration(milliseconds: 15000), setCurrentPosition);
+    Timer.periodic(const Duration(milliseconds: 5000), setCurrentPosition);
   }
 
   @override
@@ -30,12 +29,10 @@ class LocationState extends State<Location> {
   }
 
   void setCurrentPosition(Timer t) async {
-    setState(() {});
-
-    log('Quack ${quackCount++}');
     var pos = await _geolocatorPlatform.getCurrentPosition();
     _updates.add(Text('Lat: ${pos.latitude} Lon: ${pos.longitude} Speed: ${pos.speed} Time: ${pos.timestamp}'));
-  }
+    log('Update count: ${_updates.length}');
 
-  // test
+    setState(() {});
+  }
 }
