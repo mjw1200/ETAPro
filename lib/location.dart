@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
+import 'package:format/format.dart';
 
 class Location extends StatefulWidget {
   const Location({super.key});
@@ -29,18 +29,8 @@ class LocationState extends State<Location> {
 
   @override
   Widget build(BuildContext context) {
-    // List<Widget> chilluns = [];
-    // chilluns.add(Text('Update count: ${_updates.length}'));
-    // chilluns.addAll(_updates);
-
-    // return Column(mainAxisAlignment: MainAxisAlignment.center, children: chilluns);
-    // List<Widget> child = [];
-    // child.add();
-    return Text(_pos.speed.toString(), style: const TextStyle(fontSize: 72, fontFamily: 'Adlam'));
-    // return Row(
-    //     mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, children: child);
-    // return Column(
-    //     mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, children: child);
+    // format('{}', 'hello world')
+    return Text(format('{:.0f}', _pos.speed), style: const TextStyle(fontSize: 72, fontFamily: 'Adlam'));
   }
 
   void setCurrentPosition(Timer t) async {
