@@ -26,30 +26,35 @@ class LocationState extends State<Location> {
 
   @override
   Widget build(BuildContext context) {
-    const TextStyle style = TextStyle(fontSize: 22);
-    var timeRemain = _dist / _speed;
+    const TextStyle style = TextStyle(fontSize: 18, fontFamily: 'Adlam');
+    var milesDistance = (_dist * 0.000621371).round();
+    var mphSpeed = (_speed * 2.23694).round();
+
+    var secondsRemain = (_dist / _speed).round();
+    var minuteRemain = ((secondsRemain % 3600) / 60).round();
+    var hourRemain = (secondsRemain / 3600).round();
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
-          'Lat: ${_lat.toStringAsFixed(5)}',
+          'Lat: ${_lat.toStringAsFixed(3)}',
           style: style,
         ),
         Text(
-          'Lon: ${_lon.toStringAsFixed(5)}',
+          'Lon: ${_lon.toStringAsFixed(3)}',
           style: style,
         ),
         Text(
-          'Speed (m/s): ${_speed.toStringAsFixed(0)}',
+          'Speed (mph): ${mphSpeed.toStringAsFixed(0)}',
           style: style,
         ),
         Text(
-          'Dist remain (m): ${_dist.toStringAsFixed(0)}',
+          'Dist remain (mi): ${milesDistance.toStringAsFixed(0)}',
           style: style,
         ),
         Text(
-          'Time remain (s): ${timeRemain.toStringAsFixed(0)}',
+          'Time remain (hh:mm): ${hourRemain.round()}:${minuteRemain.round()}',
           style: style,
         )
       ],
@@ -74,7 +79,7 @@ class LocationState extends State<Location> {
     ];
 
     DistanceCalculator distanceCalculator = DistanceCalculator();
-    var distString = distanceCalculator.calculateRouteDistance(points, decimals: 1);
+    var distString = distanceCalculator.calculateRouteDistance(points, decimals: 3);
     _dist = double.parse(distString.substring(0, distString.length - 3)) * 1000; // distString is in km; we want meters
 
     setState(() {});
