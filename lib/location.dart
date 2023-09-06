@@ -27,28 +27,29 @@ class LocationState extends State<Location> {
   @override
   Widget build(BuildContext context) {
     const TextStyle style = TextStyle(fontSize: 22);
+    var timeRemain = _dist / _speed;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
-          'Lat: $_lat',
+          'Lat: ${_lat.toStringAsFixed(5)}',
           style: style,
         ),
         Text(
-          'Lon: $_lon',
+          'Lon: ${_lon.toStringAsFixed(5)}',
           style: style,
         ),
         Text(
-          'Speed (m/s): $_speed',
+          'Speed (m/s): ${_speed.toStringAsFixed(0)}',
           style: style,
         ),
         Text(
-          'Dist remain (m): $_dist',
+          'Dist remain (m): ${_dist.toStringAsFixed(0)}',
           style: style,
         ),
         Text(
-          'Time remain (s): ${_dist / _speed}',
+          'Time remain (s): ${timeRemain.toStringAsFixed(0)}',
           style: style,
         )
       ],
