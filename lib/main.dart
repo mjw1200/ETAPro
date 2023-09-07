@@ -1,4 +1,5 @@
 import 'package:etapro_flutter/location.dart';
+import 'package:etapro_flutter/no_permission.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -39,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Location(),
+            NoPermission(message: 'Moo'),
           ],
         ),
       ),
