@@ -4,19 +4,21 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.content.IntentFilter
+import android.location.Location
 import android.os.BatteryManager
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 
-import androidx.annotation.NonNull
+import com.google.android.gms.location.LocationServices
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity: FlutterActivity() {
     private val CHANNEL = "native_gps"
+    private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-    override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler {
                 call, result ->
@@ -28,6 +30,16 @@ class MainActivity: FlutterActivity() {
                 } else {
                     result.error("UNAVAILABLE", "Battery level not available.", null)
                 }
+            } else if (call.method == "getCurrentLocation") {
+                try {
+                    fusedLocationClient.lastLocation
+                        .addOnSuccessListener { location: Location? ->
+                            result.success(arrayOf(location!!.latitude, location.longitude))
+                        }
+                }
+                catch (e: SecurityException) {
+                    result.error("PERMISSION", "Location permissions unavailable", null)
+              }
             } else {
                 result.notImplemented()
             }
