@@ -64,6 +64,7 @@ class LocationState extends State<Location> {
   void setCurrentPosition(Timer t) async {
     // Music Villa: 45.67973305878354, -111.02897198805852
     // The Office: 45.660500254366056, -110.55933360340568
+    // Touchmark: 46.57686096725291, -111.98913545917074
     // 'AIzaSyDklNhepabAAhzB_iX5jhVfIiTCU6cHfPo'
 
     // TODO: How stable is geolocator? Should we use a Google service instead?
@@ -75,7 +76,7 @@ class LocationState extends State<Location> {
     /// LatLng is included in google_maps_flutter
     List<LatLng> points = [
       LatLng(_lat, _lon), // where you am
-      const LatLng(45.67973305878354, -111.02897198805852), // Music Villa
+      const LatLng(46.57686096725291, -111.98913545917074), // Touchmark
     ];
 
     DistanceCalculator distanceCalculator = DistanceCalculator();
