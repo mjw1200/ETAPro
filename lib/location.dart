@@ -52,7 +52,7 @@ class LocationState extends State<Location> {
     // Touchmark: 46.57686096725291, -111.98913545917074
     const TextStyle style = TextStyle(fontSize: 18, fontFamily: 'Adlam');
 
-    // double dist = _haversine(45.6530606, -110.5638456, 45.6539567, -110.564763);
+    double dist = _haversine(45.6530606, -110.5638456, 45.6539567, -110.564763);
 
     try {
       Float64List location = await platform.invokeMethod('getCurrentLocation');
@@ -70,10 +70,13 @@ class LocationState extends State<Location> {
     }
   }
 
-  // phi: latitude
-  // lambda: longitude
-  // It's sad I can't use Greek characters like φ and λ in Dart code. Oh well.
+  // ----------------------------------------------------------------------------------------------
+  // Calculate the Haversine formula (https://en.wikipedia.org/wiki/Haversine_formula) to find the
+  // distance between two lat/lon points. Phi is latitude, lambda is longitude, and no - I can't
+  // use the symbols φ and λ, much as I'd like to do. Inputs are in degrees, and the returned dist-
+  // ance is in meters.
   double _haversine(double phi1Deg, double lambda1Deg, double phi2Deg, double lambda2Deg) {
+    const double earthRadius = 6.371e6; // meters
     const double toRadians = 0.01745;
 
     double phi1 = phi1Deg * toRadians;
@@ -84,15 +87,9 @@ class LocationState extends State<Location> {
     double deltaLam = lambda2 - lambda1;
     double deltaPhi = phi2 - phi1;
 
-    double term1 = sin(deltaPhi / 2);
-    term1 *= term1; // term1^2
-    double term2 = cos(phi1);
-    double term3 = cos(phi2);
-    double term4 = sin(deltaLam / 2);
-    term4 *= term4; // term4^2
+    double sin2Phi = pow(sin(deltaPhi / 2), 2) as double;
+    double sin2Lam = pow(sin(deltaLam / 2), 2) as double;
 
-    double distInMeters = 2 * 6.371e6 * asin(sqrt(term1 + term2 * term3 * term4));
-
-    return distInMeters;
+    return 2 * earthRadius * asin(sqrt(sin2Phi + cos(phi1) * cos(phi2) * sin2Lam));
   }
 }
