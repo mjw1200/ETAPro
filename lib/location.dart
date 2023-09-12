@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:ffi';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,7 +21,7 @@ class LocationState extends State<Location> {
 
   final int _updateInterval = 5000; // ms
   // double _speed = 0.001; // ensure non-zero
-  String _batteryLevel = 'Unknown';
+  Float64List _location = Float64List.fromList([88.88, 99.99]);
 
   LocationState() : super() {
     Timer.periodic(Duration(milliseconds: _updateInterval), periodicUpdate);
@@ -37,7 +40,7 @@ class LocationState extends State<Location> {
         //   style: style,
         // ),
         Text(
-          'Battery level (%): $_batteryLevel',
+          'Lat: ${_location[0]} / Lon: ${_location[1]}',
           style: style,
         ),
       ],
@@ -48,17 +51,15 @@ class LocationState extends State<Location> {
     // Music Villa: 45.67973305878354, -111.02897198805852
     // The Office: 45.660500254366056, -110.55933360340568
     // Touchmark: 46.57686096725291, -111.98913545917074
-    String batteryLevel;
 
     try {
-      final int result = await platform.invokeMethod('getBatteryLevel');
-      batteryLevel = 'Battery level at $result % .';
-    } on PlatformException catch (e) {
-      batteryLevel = "Failed to get battery level: '${e.message}'.";
-    }
+      Float64List location = await platform.invokeMethod('getCurrentLocation');
 
-    setState(() {
-      _batteryLevel = batteryLevel;
-    });
+      setState(() {
+        _location = location;
+      });
+    } on PlatformException catch (e) {
+      stderr.write('Caught a PlatformException in periodicUpdate: ${e.message}');
+    }
   }
 }
