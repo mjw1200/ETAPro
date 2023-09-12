@@ -19,52 +19,90 @@ class Location extends StatefulWidget {
 
 class LocationState extends State<Location> {
   static const platform = MethodChannel('native_gps');
+  static const locationPerUI = 5; // location updates per UI update
+  static const _msToSec = 1000;
 
-  final int _updateInterval = 5000; // ms
-  // double _speed = 0.001; // ensure non-zero
-  Float64List _location = Float64List.fromList([88.88, 99.99]);
-  List<Widget> _chilluns = [];
+  int _updateLocationInterval = 0; // ms
+  int _updateUIInterval = 0; // ms
+  Float64List _currentLocation = Float64List.fromList([]);
+  Float64List _lastLocation = Float64List.fromList([]);
+  List<int> _mpsSpeeds = [];
+  int _avgMpsSpeed = 0;
 
   LocationState() : super() {
-    Timer.periodic(Duration(milliseconds: _updateInterval), periodicUpdate);
+    _updateLocationInterval = 2000; // ms
+    _updateUIInterval = _updateLocationInterval * locationPerUI; // ms
+
+    Timer.periodic(Duration(milliseconds: _updateLocationInterval), updateLocation);
+    Timer.periodic(Duration(milliseconds: _updateUIInterval), updateUI);
   }
 
   @override
   Widget build(BuildContext context) {
-    // var mphSpeed = (_speed * 2.23694).round();
+    const TextStyle style = TextStyle(fontSize: 24, fontFamily: 'Adlam');
+    const mpsToMph = 2.23694;
 
-    return Column(mainAxisAlignment: MainAxisAlignment.start, children: _chilluns // [
-        // Text(
-        //   'Speed (mph): ${mphSpeed.toStringAsFixed(0)}',
-        //   style: style,
-        // ),
-        //   Text(
-        //     'Lat: ${_location[0]} / Lon: ${_location[1]}',
-        //     style: style,
-        //   ),
-        // ],
-        );
+    int mphSpeed = 0;
+
+    // if (_lastLocation.isNotEmpty) {
+    //   dist = _haversine(_lastLocation, _currentLocation);
+    //   speed = (dist / (_updateLocationInterval / _msToSec)).round(); // m/s
+    //   mphSpeed = (speed * mpsToMph).round();
+    // }
+
+    mphSpeed = (_avgMpsSpeed * mpsToMph).round();
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text(
+          '$_avgMpsSpeed m/s',
+          style: style,
+        ),
+        Text(
+          '$mphSpeed mph',
+          style: style,
+        ),
+      ],
+    );
   }
 
-  void periodicUpdate(Timer t) async {
+  void updateUI(Timer t) async {
+    setState(() {});
+  }
+
+  void updateLocation(Timer t) async {
     // Music Villa: 45.67973305878354, -111.02897198805852
     // The Office: 45.660500254366056, -110.55933360340568
     // Touchmark: 46.57686096725291, -111.98913545917074
-    const TextStyle style = TextStyle(fontSize: 18, fontFamily: 'Adlam');
 
-    double dist = _haversine(45.6530606, -110.5638456, 45.6539567, -110.564763);
+    double dist = 0.0;
+    int speed = 0;
 
     try {
-      Float64List location = await platform.invokeMethod('getCurrentLocation');
+      Float64List newLocation = await platform.invokeMethod('getCurrentLocation');
+      _lastLocation = _currentLocation;
+      _currentLocation = newLocation;
 
-      setState(() {
-        _location = location;
+      dist = _haversine(_lastLocation, _currentLocation);
+      speed = (dist / (_updateLocationInterval / _msToSec)).round(); // m/s
 
-        _chilluns.add(Text(
-          'Lat: ${_location[0]} / Lon: ${_location[1]}',
-          style: style,
-        ));
-      });
+      if (_mpsSpeeds.length == 5) {
+        _mpsSpeeds.removeAt(0);
+      }
+
+      _mpsSpeeds.add(speed);
+
+      if (_mpsSpeeds.length == 5) {
+        int total = 0;
+
+        var iter = _mpsSpeeds.iterator;
+        while (iter.moveNext()) {
+          total += iter.current;
+        }
+
+        _avgMpsSpeed = (total / 5).round();
+      }
     } on PlatformException catch (e) {
       stderr.write('Caught a PlatformException in periodicUpdate: ${e.message}');
     }
@@ -75,14 +113,18 @@ class LocationState extends State<Location> {
   // distance between two lat/lon points. Phi is latitude, lambda is longitude, and no - I can't
   // use the symbols φ and λ, much as I'd like to do. Inputs are in degrees, and the returned dist-
   // ance is in meters.
-  double _haversine(double phi1Deg, double lambda1Deg, double phi2Deg, double lambda2Deg) {
+  double _haversine(Float64List p1, Float64List p2) {
     const double earthRadius = 6.371e6; // meters
     const double toRadians = 0.01745;
 
-    double phi1 = phi1Deg * toRadians;
-    double lambda1 = lambda1Deg * toRadians;
-    double phi2 = phi2Deg * toRadians;
-    double lambda2 = lambda2Deg * toRadians;
+    if (p1.isEmpty || p2.isEmpty) {
+      return 0.0;
+    }
+
+    double phi1 = p1[0] * toRadians;
+    double lambda1 = p1[1] * toRadians;
+    double phi2 = p2[0] * toRadians;
+    double lambda2 = p2[1] * toRadians;
 
     double deltaLam = lambda2 - lambda1;
     double deltaPhi = phi2 - phi1;
