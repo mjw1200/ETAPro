@@ -1,0 +1,4 @@
+"Minimum distance" speed estimation:
+  * Don't worry about calculating speed until you've gone some minimum distance.
+  * 50 meters or 100 meters or etc. Play around with it, experiment.
+  * Going every 10 seconds or whatever could mean ridiculously short point separation, which seems error prone.
