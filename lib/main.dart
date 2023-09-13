@@ -2,20 +2,25 @@ import 'package:etapro_flutter/location.dart';
 import 'package:etapro_flutter/no_permission.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'dart:io' show Platform;
 
 void main() {
   ensurePermissions().then((value) => {runApp(MyApp(permissions: value))});
 }
 
 Future<bool> ensurePermissions() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  var permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
+  if (Platform.isWindows) {
     return true;
-  } else if (permission == LocationPermission.denied) {
-    var permission2 = await Geolocator.requestPermission();
-    if (permission2 == LocationPermission.always || permission2 == LocationPermission.whileInUse) {
+  } else {
+    WidgetsFlutterBinding.ensureInitialized();
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
       return true;
+    } else if (permission == LocationPermission.denied) {
+      var permission2 = await Geolocator.requestPermission();
+      if (permission2 == LocationPermission.always || permission2 == LocationPermission.whileInUse) {
+        return true;
+      }
     }
   }
 

@@ -1,5 +1,4 @@
 import 'dart:async';
-// import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
@@ -18,23 +17,19 @@ class Location extends StatefulWidget {
 }
 
 class LocationState extends State<Location> {
-  static const platform = MethodChannel('native_gps');
-  static const locationPerUI = 5; // location updates per UI update
-  static const _msToSec = 1000;
+  static const _platform = MethodChannel('native_gps');
+  static const _updateInterval = 5000; // ms
+  static const _minimumMeters = 100;
 
-  int _updateLocationInterval = 0; // ms
-  int _updateUIInterval = 0; // ms
-  Float64List _currentLocation = Float64List.fromList([]);
+  int _lastEpochSeconds = 0;
+  int _speed = 0; // m/s
+  int _updateCount = 0;
+  int _lastDist = 0;
+
   Float64List _lastLocation = Float64List.fromList([]);
-  List<int> _mpsSpeeds = [];
-  int _avgMpsSpeed = 0;
 
   LocationState() : super() {
-    _updateLocationInterval = 2000; // ms
-    _updateUIInterval = _updateLocationInterval * locationPerUI; // ms
-
-    Timer.periodic(Duration(milliseconds: _updateLocationInterval), updateLocation);
-    Timer.periodic(Duration(milliseconds: _updateUIInterval), updateUI);
+    Timer.periodic(const Duration(milliseconds: _updateInterval), updateLocation);
   }
 
   @override
@@ -44,19 +39,21 @@ class LocationState extends State<Location> {
 
     int mphSpeed = 0;
 
-    // if (_lastLocation.isNotEmpty) {
-    //   dist = _haversine(_lastLocation, _currentLocation);
-    //   speed = (dist / (_updateLocationInterval / _msToSec)).round(); // m/s
-    //   mphSpeed = (speed * mpsToMph).round();
-    // }
-
-    mphSpeed = (_avgMpsSpeed * mpsToMph).round();
+    mphSpeed = (_speed * mpsToMph).round();
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
-          '$_avgMpsSpeed m/s',
+          '$_updateCount updates',
+          style: style,
+        ),
+        Text(
+          '$_lastDist m',
+          style: style,
+        ),
+        Text(
+          '$_speed m/s',
           style: style,
         ),
         Text(
@@ -67,41 +64,31 @@ class LocationState extends State<Location> {
     );
   }
 
-  void updateUI(Timer t) async {
-    setState(() {});
-  }
-
   void updateLocation(Timer t) async {
     // Music Villa: 45.67973305878354, -111.02897198805852
     // The Office: 45.660500254366056, -110.55933360340568
     // Touchmark: 46.57686096725291, -111.98913545917074
 
     double dist = 0.0;
-    int speed = 0;
 
     try {
-      Float64List newLocation = await platform.invokeMethod('getCurrentLocation');
-      _lastLocation = _currentLocation;
-      _currentLocation = newLocation;
+      Float64List newLocation = await _platform.invokeMethod('getCurrentLocation');
 
-      dist = _haversine(_lastLocation, _currentLocation);
-      speed = (dist / (_updateLocationInterval / _msToSec)).round(); // m/s
+      dist = _haversine(_lastLocation, newLocation);
 
-      if (_mpsSpeeds.length == 5) {
-        _mpsSpeeds.removeAt(0);
-      }
+      if (_lastLocation.isEmpty) {
+        _lastLocation = newLocation;
+      } else if (dist > _minimumMeters) {
+        var currentEpochSeconds = (DateTime.now().millisecondsSinceEpoch / Duration.millisecondsPerSecond).round();
+        var elapsedSeconds = currentEpochSeconds - _lastEpochSeconds;
 
-      _mpsSpeeds.add(speed);
-
-      if (_mpsSpeeds.length == 5) {
-        int total = 0;
-
-        var iter = _mpsSpeeds.iterator;
-        while (iter.moveNext()) {
-          total += iter.current;
-        }
-
-        _avgMpsSpeed = (total / 5).round();
+        setState(() {
+          _speed = (dist / elapsedSeconds).round();
+          _lastEpochSeconds = currentEpochSeconds;
+          _lastLocation = newLocation;
+          _lastDist = dist.round();
+          _updateCount++;
+        });
       }
     } on PlatformException catch (e) {
       stderr.write('Caught a PlatformException in periodicUpdate: ${e.message}');
@@ -111,8 +98,8 @@ class LocationState extends State<Location> {
   // ----------------------------------------------------------------------------------------------
   // Calculate the Haversine formula (https://en.wikipedia.org/wiki/Haversine_formula) to find the
   // distance between two lat/lon points. Phi is latitude, lambda is longitude, and no - I can't
-  // use the symbols φ and λ, much as I'd like to do. Inputs are in degrees, and the returned dist-
-  // ance is in meters.
+  // use the symbols φ and λ, much as I'd like to do. Inputs are in degrees, and the returned
+  // distance is in meters.
   double _haversine(Float64List p1, Float64List p2) {
     const double earthRadius = 6.371e6; // meters
     const double toRadians = 0.01745;
