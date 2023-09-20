@@ -27,8 +27,9 @@ class MainActivity: FlutterActivity() {
 
             if (call.method == "getCurrentLocation") {
                 // 102 is PRIORITY_BALANCED_POWER_ACCURACY
+                // 100 is PRIORITY_HIGH_ACCURACY
                 // https://developers.google.com/android/reference/com/google/android/gms/location/Priority
-                fusedLocationClient.getCurrentLocation(102, null)
+                fusedLocationClient.getCurrentLocation(100, null)
                 .addOnSuccessListener { 
                     location: Location? ->
                     result.success(doubleArrayOf(location!!.latitude, location.longitude))
