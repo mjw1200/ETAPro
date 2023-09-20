@@ -32,7 +32,7 @@ class MainActivity: FlutterActivity() {
                 .addOnSuccessListener { 
                     location: Location? ->
                     result.success(doubleArrayOf(location!!.latitude, location.longitude))
-                }
+                }                
             }
             else {
                 result.notImplemented()

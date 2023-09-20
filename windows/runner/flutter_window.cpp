@@ -10,7 +10,7 @@
 #include <memory>
 #include <optional>
 
-#include "flutter/generated_plugin_registrant.h"
+// #include "flutter/generated_plugin_registrant.h"
 
 FlutterWindow::FlutterWindow(const flutter::DartProject& project)
     : project_(project) {}
@@ -32,7 +32,7 @@ bool FlutterWindow::OnCreate() {
   if (!flutter_controller_->engine() || !flutter_controller_->view()) {
     return false;
   }
-  RegisterPlugins(flutter_controller_->engine());
+  // RegisterPlugins(flutter_controller_->engine());
 
   flutter::MethodChannel<> channel(
       flutter_controller_->engine()->messenger(), "native_gps",
@@ -44,6 +44,7 @@ bool FlutterWindow::OnCreate() {
               if (call.method_name() == "getCurrentLocation") {
                   std::vector<double> fakeLocation = { fakePoints[lastUsedFakePoint][0], fakePoints[lastUsedFakePoint][1] };
                   lastUsedFakePoint++;
+                  lastUsedFakePoint %= POINT_COUNT;
                   result->Success(flutter::EncodableValue(fakeLocation));
               }
               else {

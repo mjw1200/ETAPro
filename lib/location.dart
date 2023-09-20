@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 // import 'package:google_maps_flutter/google_maps_flutter.dart';
 // import 'package:google_maps_routes/google_maps_routes.dart';
 // import 'package:geolocator/geolocator.dart';
@@ -21,12 +22,14 @@ class LocationState extends State<Location> {
   static const _updateInterval = 5000; // ms
   static const _minimumMeters = 100;
 
-  int _lastEpochSeconds = 0;
+  int _lastEpochSeconds = (DateTime.now().millisecondsSinceEpoch / Duration.millisecondsPerSecond).round();
   int _speed = 0; // m/s
   int _updateCount = 0;
+  int _skipCount = 0;
   int _lastDist = 0;
+  int _elapsedSeconds = 0;
 
-  Float64List _lastLocation = Float64List.fromList([]);
+  Float64List _startLocation = Float64List.fromList([]);
 
   LocationState() : super() {
     Timer.periodic(const Duration(milliseconds: _updateInterval), updateLocation);
@@ -46,6 +49,14 @@ class LocationState extends State<Location> {
       children: [
         Text(
           '$_updateCount updates',
+          style: style,
+        ),
+        Text(
+          '$_skipCount skips',
+          style: style,
+        ),
+        Text(
+          '$_elapsedSeconds s',
           style: style,
         ),
         Text(
@@ -74,20 +85,30 @@ class LocationState extends State<Location> {
     try {
       Float64List newLocation = await _platform.invokeMethod('getCurrentLocation');
 
-      dist = _haversine(_lastLocation, newLocation);
+      dist = _haversine(_startLocation, newLocation);
 
-      if (_lastLocation.isEmpty) {
-        _lastLocation = newLocation;
+      if (_startLocation.isEmpty) {
+        _startLocation = newLocation;
       } else if (dist > _minimumMeters) {
         var currentEpochSeconds = (DateTime.now().millisecondsSinceEpoch / Duration.millisecondsPerSecond).round();
-        var elapsedSeconds = currentEpochSeconds - _lastEpochSeconds;
+        _elapsedSeconds = currentEpochSeconds - _lastEpochSeconds;
+        _speed = (dist / _elapsedSeconds).round();
+
+        final Directory appDocumentsDir = await getApplicationDocumentsDirectory();
+        await File('${appDocumentsDir.path}/mjw_debug_1.txt').writeAsString(
+            "$currentEpochSeconds,${_startLocation[0]},${_startLocation[1]},${newLocation[0]},${newLocation[1]},$dist,$_elapsedSeconds,$_speed\n",
+            mode: FileMode.append);
 
         setState(() {
-          _speed = (dist / elapsedSeconds).round();
           _lastEpochSeconds = currentEpochSeconds;
-          _lastLocation = newLocation;
+          _startLocation = newLocation;
           _lastDist = dist.round();
           _updateCount++;
+          _skipCount = 0;
+        });
+      } else {
+        setState(() {
+          _skipCount++;
         });
       }
     } on PlatformException catch (e) {

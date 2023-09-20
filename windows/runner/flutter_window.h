@@ -31,7 +31,16 @@ class FlutterWindow : public Win32Window {
 
   int lastUsedFakePoint = 0;
 
-  double fakePoints[17][2]{
+  #define POINT_COUNT 17
+
+// A random line on Google Earth, down highway 89
+//   double fakePoints[POINT_COUNT][2]{
+//       { 45.626837, -110.5775534 },
+//       { 45.6399944, -110.5747258 },
+//   };
+
+// A walk down the block (17 points)
+  double fakePoints[POINT_COUNT][2]{
         { 45.6530606,-110.5638456 },
         { 45.6531729, -110.5638227 },
         { 45.653217,-110.5638329 },
@@ -46,7 +55,7 @@ class FlutterWindow : public Win32Window {
         { 45.6537156,-110.5641574 },
         { 45.653841,-110.5641983 },
         { 45.6538758,-110.5642895 },
-        { 45.6539424,-110.5646416 },
+        { 45.6539424,-110.5646416 }, // > 100m, 13 skips
         { 45.6539565,-110.5647275 },
         { 45.6539567,-110.564763 }
   };
