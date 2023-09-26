@@ -1,4 +1,4 @@
-import 'package:etapro_flutter/location.dart';
+import 'package:etapro_flutter/summary.dart';
 import 'package:etapro_flutter/no_permission.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -62,7 +62,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    Widget theWidget = super.widget.permissions ? const Location() : const NoPermission(message: 'No Permissions');
+    Widget theWidget = super.widget.permissions ? const Summary() : const NoPermission(message: 'No Permissions');
 
     return Scaffold(
       appBar: AppBar(
