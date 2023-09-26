@@ -10,7 +10,6 @@ class Speed {
   final _platform = const MethodChannel('native_gps');
   final int _updateInterval; // ms
   Float64List? _currentLocation; // [0] is latitude, [1] is longitude
-  final int _minimumDistance; // meters
   final _minimumSpeedCount = 5;
   final _lastFewSpeeds = [];
   late Directory appDocumentsDir;
@@ -18,7 +17,7 @@ class Speed {
   int _tUpdate = 0; // last update, relative to _tZero
   String _logFileName = '';
 
-  Speed(this._updateInterval, this._minimumDistance) {
+  Speed(this._updateInterval) {
     _platform.invokeMethod('getCurrentLocation').then((value) => _currentLocation = value);
     Timer.periodic(Duration(milliseconds: _updateInterval), _updateSpeed);
     getApplicationDocumentsDirectory().then((value) => {_setLogFileName(value)});
@@ -35,19 +34,24 @@ class Speed {
     var newLocation = await _platform.invokeMethod('getCurrentLocation');
     var distance = _haversine(_currentLocation!, newLocation);
 
+    if (newLocation[0] < 0 && newLocation[1] < 0) {
+      _log('_updateSpeed: Out of data; quitting');
+      exit(0);
+    }
+
     var speed = distance / elapsedTime;
     _log(
-        '_updateSpeed: curlat/curlon/newlat/newlon/dist/elapsedTime/speed,${_currentLocation![0]},${_currentLocation![1]},${newLocation[0]},${newLocation[1]},$distance,$elapsedTime,$speed');
+        '_updateSpeed: lat1,${_currentLocation![0]},lon1,${_currentLocation![1]},lat2,${newLocation[0]},lon2,${newLocation[1]},dist,$distance,time,$elapsedTime,speed,$speed');
 
-    if (speed < 40) {
-      // 40 m/s is 89.4 mph. Ignore outrageous values.
+    if (speed < 45) {
+      // 45 m/s is 100.662 mph. Ignore outrageous values.
       _addASpeed(speed.round());
-      _tUpdate = now;
     } else {
-      _log('_updateSpeed: Speed too high ($speed), ignoring');
+      _log('_updateSpeed: Speed too high, ignoring');
     }
 
     _currentLocation = newLocation;
+    _tUpdate = now;
 
     _log('_updateSpeed: End');
   }

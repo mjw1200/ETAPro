@@ -12,12 +12,11 @@ class Summary extends StatefulWidget {
 
 class SummaryState extends State<Summary> {
   static const int updateInterval = 15000;
-  Speed speed = Speed(updateInterval, 100);
+  Speed speed = Speed(updateInterval);
   var mpsSpeed = -2;
 
   SummaryState() : super() {
-    // +300: Poll speed a little bit after it's been calculated
-    Timer.periodic(const Duration(milliseconds: updateInterval + 300), getCurrentSpeed);
+    Timer.periodic(const Duration(milliseconds: updateInterval + 50), getCurrentSpeed);
   }
 
   @override
