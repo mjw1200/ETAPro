@@ -8,97 +8,68 @@ import 'package:path_provider/path_provider.dart';
 
 class Speed {
   final int _updateInterval; // ms
-  final int _sampleSize;
+  int _currentSpeed = -1;
   double _lastUpdateTime = 0; // last update time, in seconds-since-epoch
   double _tZero = 0; // app start time, in seconds-since-epoch
 
   final _platform = const MethodChannel('native_gps');
-  late Directory appDocumentsDir;
   Float64List? _currentLocation; // [0] is latitude, [1] is longitude
   String _logFileName = '';
-  final _speeds = []; // speeds are averaged
 
-  Speed(this._updateInterval, this._sampleSize) {
+  Speed(this._updateInterval) {
     _platform.invokeMethod('getCurrentLocation').then((value) => _currentLocation = value);
     Timer.periodic(Duration(milliseconds: _updateInterval), _updateSpeed);
     getApplicationDocumentsDirectory().then((value) => {_setLogFileName(value)});
   }
 
   // ----------------------------------------------------------------------------------------------
-  // Read a "raw" speed, and handle it appropriately
+  // ...
   void _updateSpeed(Timer t) async {
-    _log('_updateSpeed: Start');
+    const String functionName = "_updateSpeed";
 
-    var now = _now();
-    var elapsedTime = now - _lastUpdateTime;
+    _log('$functionName: Start');
 
     var newLocation = await _platform.invokeMethod('getCurrentLocation');
-    var distance = _haversine(_currentLocation!, newLocation);
 
+    // Debugging support, for now. It's possible both lat and lon could be negative IRL, but
+    // I'll take that up later. Right now I need a way to stop replays at the appropriate time.
     if (newLocation[0] < 0 && newLocation[1] < 0) {
-      _log('_updateSpeed: Out of data; quitting');
+      _log('$functionName: Out of data; quitting');
       exit(0);
     }
 
-    var speed = distance / elapsedTime;
-    _log(
-        '_updateSpeed: lat1,${_currentLocation![0]},lon1,${_currentLocation![1]},lat2,${newLocation[0]},lon2,${newLocation[1]},dist,$distance,time,$elapsedTime,speed,$speed');
+    var distance = _haversine(_currentLocation!, newLocation);
 
-    if (speed < 45 && speed >= 1) {
-      // Constrain values. 45 m/s is 100.662 mph, and zeroes fuck up the average
-      _addASpeed(speed.round());
+    var now = _now();
+    var elapsedTime = now - _lastUpdateTime;
+    var speed = distance / elapsedTime;
+
+    _log('$functionName: from ${_currentLocation![0]},${_currentLocation![1]}');
+    _log('$functionName: to ${newLocation[0]},${newLocation[1]}');
+    _log('$functionName: distance $distance m');
+    _log('$functionName: time $elapsedTime s');
+    _log('$functionName: speed $speed m/s (${speed * 2.23694} mph)');
+
+    if (speed < 45) {
+      // 45 m/s is 100.662 mph. Unlikely, in a standard car.
+      _currentSpeed = speed.round();
     } else {
-      _log('_updateSpeed: Speed out of range, ignoring');
+      _log('$functionName: Speed seems silly. Ignoring');
     }
 
     _currentLocation = newLocation;
     _lastUpdateTime = now;
 
-    _log('_updateSpeed: End');
+    _log('$functionName: End');
   }
 
   // ----------------------------------------------------------------------------------------------
-  // Add a speed to the collection. Remove the oldest speed if that gives us more speeds than we
-  // want
-  void _addASpeed(int speed) {
-    _log('_addASpeed: Start');
+  // ...
+  int getCurrentSpeed() {
+    const String functionName = "getCurrentSpeed";
+    _log('$functionName: Start. Reporting $_currentSpeed m/s (${_currentSpeed * 2.23694} mph). End.');
 
-    _speeds.add(speed);
-
-    if (_speeds.length > _sampleSize) {
-      _log('_addASpeed: Removing oldest speed sample');
-      _speeds.removeAt(0);
-    }
-
-    // DEBUG
-    String debugSpeeds = "";
-    for (var element in _speeds) {
-      debugSpeeds += "$element,";
-    }
-
-    _log('_addASpeed: End $debugSpeeds');
-  }
-
-  // ----------------------------------------------------------------------------------------------
-  // Average the accumulated speeds. Return -1 if we don't have enough samples yet.
-  int getMostRecentSpeed() {
-    _log('getMostRecentSpeed: Start');
-
-    if (_speeds.length < _sampleSize) {
-      _log('getMostRecentSpeed: Not enough speeds. Have ${_speeds.length}, need $_sampleSize');
-      return -1;
-    }
-
-    int total = 0;
-
-    for (final speed in _speeds) {
-      total += speed as int;
-    }
-
-    var speed = (total / _sampleSize).round();
-
-    _log('getMostRecentSpeed: End ($speed) m/s');
-    return speed;
+    return _currentSpeed;
   }
 
   // ----------------------------------------------------------------------------------------------
@@ -138,9 +109,8 @@ class Speed {
   }
 
   void _setLogFileName(Directory dir) {
-    appDocumentsDir = dir;
     _tZero = _now();
     _lastUpdateTime = _tZero;
-    _logFileName = '${appDocumentsDir.path}/mjw_debug_$_tZero.txt';
+    _logFileName = '${dir.path}/mjw_debug_$_tZero.txt';
   }
 }

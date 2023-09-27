@@ -11,8 +11,8 @@ class Summary extends StatefulWidget {
 }
 
 class SummaryState extends State<Summary> {
-  static const int updateInterval = 7500; // ms
-  Speed speed = Speed(updateInterval, 5);
+  static const int updateInterval = 30000; // ms
+  Speed speed = Speed(updateInterval);
   var mpsSpeed = -2;
 
   SummaryState() : super() {
@@ -42,7 +42,7 @@ class SummaryState extends State<Summary> {
 
   void getCurrentSpeed(Timer t) async {
     setState(() {
-      mpsSpeed = speed.getMostRecentSpeed();
+      mpsSpeed = speed.getCurrentSpeed();
     });
   }
 }
