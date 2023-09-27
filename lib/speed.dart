@@ -7,17 +7,18 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 class Speed {
-  final _platform = const MethodChannel('native_gps');
   final int _updateInterval; // ms
-  Float64List? _currentLocation; // [0] is latitude, [1] is longitude
-  final _minimumSpeedCount = 5;
-  final _lastFewSpeeds = [];
-  late Directory appDocumentsDir;
-  int _tZero = 0; // app start, in seconds
-  int _tUpdate = 0; // last update, relative to _tZero
-  String _logFileName = '';
+  final int _sampleSize;
+  int _lastUpdateTime = 0; // last update time, in seconds-since-epoch
+  int _tZero = 0; // app start time, in seconds-since-epoch
 
-  Speed(this._updateInterval) {
+  final _platform = const MethodChannel('native_gps');
+  late Directory appDocumentsDir;
+  Float64List? _currentLocation; // [0] is latitude, [1] is longitude
+  String _logFileName = '';
+  final _speeds = []; // speeds are averaged
+
+  Speed(this._updateInterval, this._sampleSize) {
     _platform.invokeMethod('getCurrentLocation').then((value) => _currentLocation = value);
     Timer.periodic(Duration(milliseconds: _updateInterval), _updateSpeed);
     getApplicationDocumentsDirectory().then((value) => {_setLogFileName(value)});
@@ -29,7 +30,7 @@ class Speed {
     _log('_updateSpeed: Start');
 
     var now = _now();
-    var elapsedTime = now - _tUpdate;
+    var elapsedTime = now - _lastUpdateTime;
 
     var newLocation = await _platform.invokeMethod('getCurrentLocation');
     var distance = _haversine(_currentLocation!, newLocation);
@@ -43,15 +44,15 @@ class Speed {
     _log(
         '_updateSpeed: lat1,${_currentLocation![0]},lon1,${_currentLocation![1]},lat2,${newLocation[0]},lon2,${newLocation[1]},dist,$distance,time,$elapsedTime,speed,$speed');
 
-    if (speed < 45) {
-      // 45 m/s is 100.662 mph. Ignore outrageous values.
+    if (speed < 45 && speed >= 1) {
+      // Constrain values. 45 m/s is 100.662 mph, and zeroes fuck up the average
       _addASpeed(speed.round());
     } else {
-      _log('_updateSpeed: Speed too high, ignoring');
+      _log('_updateSpeed: Speed out of range, ignoring');
     }
 
     _currentLocation = newLocation;
-    _tUpdate = now;
+    _lastUpdateTime = now;
 
     _log('_updateSpeed: End');
   }
@@ -62,16 +63,16 @@ class Speed {
   void _addASpeed(int speed) {
     _log('_addASpeed: Start');
 
-    _lastFewSpeeds.add(speed);
+    _speeds.add(speed);
 
-    if (_lastFewSpeeds.length > _minimumSpeedCount) {
-      _log('_addASpeed: Too many speeds (${_lastFewSpeeds.length}). Dropping one.');
-      _lastFewSpeeds.removeAt(0);
+    if (_speeds.length > _sampleSize) {
+      _log('_addASpeed: Removing oldest speed sample');
+      _speeds.removeAt(0);
     }
 
     // DEBUG
     String debugSpeeds = "";
-    for (var element in _lastFewSpeeds) {
+    for (var element in _speeds) {
       debugSpeeds += "$element,";
     }
 
@@ -83,18 +84,18 @@ class Speed {
   int getMostRecentSpeed() {
     _log('getMostRecentSpeed: Start');
 
-    if (_lastFewSpeeds.length < _minimumSpeedCount) {
-      _log('getMostRecentSpeed: Not enough speeds. Have ${_lastFewSpeeds.length}, need $_minimumSpeedCount');
+    if (_speeds.length < _sampleSize) {
+      _log('getMostRecentSpeed: Not enough speeds. Have ${_speeds.length}, need $_sampleSize');
       return -1;
     }
 
     int total = 0;
 
-    for (final speed in _lastFewSpeeds) {
+    for (final speed in _speeds) {
       total += speed as int;
     }
 
-    var speed = (total / _minimumSpeedCount).round();
+    var speed = (total / _sampleSize).round();
 
     _log('getMostRecentSpeed: End ($speed) m/s');
     return speed;
@@ -139,7 +140,7 @@ class Speed {
   void _setLogFileName(Directory dir) {
     appDocumentsDir = dir;
     _tZero = _now();
-    _tUpdate = _tZero;
+    _lastUpdateTime = _tZero;
     _logFileName = '${appDocumentsDir.path}/mjw_debug_$_tZero.txt';
   }
 }

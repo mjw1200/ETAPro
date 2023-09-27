@@ -11,20 +11,19 @@ class Summary extends StatefulWidget {
 }
 
 class SummaryState extends State<Summary> {
-  static const int updateInterval = 15000;
-  Speed speed = Speed(updateInterval);
+  static const int updateInterval = 7500; // ms
+  Speed speed = Speed(updateInterval, 5);
   var mpsSpeed = -2;
 
   SummaryState() : super() {
-    Timer.periodic(const Duration(milliseconds: updateInterval + 50), getCurrentSpeed);
+    // +100: Make the display polling interval a skosh longer than the speed update interval
+    Timer.periodic(const Duration(milliseconds: updateInterval + 100), getCurrentSpeed);
   }
 
   @override
   Widget build(BuildContext context) {
     const TextStyle style = TextStyle(fontSize: 24, fontFamily: 'Adlam');
-    const mpsToMph = 2.23694;
-
-    var mphSpeed = (mpsSpeed * mpsToMph).round();
+    final mphSpeed = (mpsSpeed * 2.23694).round();
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
