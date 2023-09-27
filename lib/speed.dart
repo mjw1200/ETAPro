@@ -9,8 +9,8 @@ import 'package:path_provider/path_provider.dart';
 class Speed {
   final int _updateInterval; // ms
   final int _sampleSize;
-  int _lastUpdateTime = 0; // last update time, in seconds-since-epoch
-  int _tZero = 0; // app start time, in seconds-since-epoch
+  double _lastUpdateTime = 0; // last update time, in seconds-since-epoch
+  double _tZero = 0; // app start time, in seconds-since-epoch
 
   final _platform = const MethodChannel('native_gps');
   late Directory appDocumentsDir;
@@ -128,9 +128,9 @@ class Speed {
     return 2 * earthRadius * asin(sqrt(sin2Phi + cos(phi1) * cos(phi2) * sin2Lam));
   }
 
-  static int _now() {
+  static double _now() {
     var dt = DateTime.now();
-    return (dt.millisecondsSinceEpoch / Duration.millisecondsPerSecond).round();
+    return dt.millisecondsSinceEpoch / Duration.millisecondsPerSecond;
   }
 
   void _log(String message) {
