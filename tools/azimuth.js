@@ -1,5 +1,7 @@
 // https://www.omnicalculator.com/other/azimuth#azimuth-formula
 
+// Standard Azimuths:
+// ------------------
 // N: 0°
 // NNE: 22.5°
 // NE: 45°
@@ -17,29 +19,45 @@
 // NW: 315°
 // NNW: 337.5°
 
-// 414 S. 8th St. (Home): 45.6534534, -110.5647570
-// Music Villa (~W): 45.6797106, -111.0290149
-// Railyard (~NNE): 45.6673855, -110.5561042
-// Climbin' Cliffs (~NE): 45.6658662, -110.5370806
-// Wineglass (~SW): 45.6198655, -110.6343549
-// Siebeck Island (~S): 45.6475314, -110.5605613
-// Town & Country (~W): 45.6522341, -110.5708737
+// φ: index 0 λ: index 1
+const home = [45.6534670, -110.5644159];
+const north = [45.6590000, -110.5644159];
+const northeast = [45.6590000, -110.5570000];
+const east = [45.6534670, -110.5570000];
+const southeast = [45.6480000, -110.5570000];
+const south = [45.6480000, -110.5644159];
+const southwest = [45.6480000, -110.5720000];
+const west = [45.6534670, -110.5720000];
+const northwest = [45.6590000, -110.5720000];
 
 const φ1deg = 45.6534534; // lat
 const λ1deg = -110.5647570; // lon
 const φ2deg = 45.6797106; // lat
 const λ2deg = -111.0290149; // lon
 
-// Convert degrees to radians for Math.*
-const φ1 = φ1deg * (Math.PI/180);
-const λ1 = λ1deg * (Math.PI/180);
-const φ2 = φ2deg * (Math.PI/180);
-const λ2 = λ2deg * (Math.PI/180);
-const Δλ = λ2 - λ1;
+const degToRad = Math.PI/180;
+const radToDeg = 180/Math.PI;
 
-const rads = Math.atan2(Math.sin(Δλ)*Math.cos(φ2), 
-    Math.cos(φ1)*Math.sin(φ2) - Math.sin(φ1)*Math.cos(φ2)*Math.cos(Δλ));    
-var degs = rads * (180/Math.PI);
-degs = (degs + 360) % 360;
+console.log(`north: ${calculateAzimuth(home, north)}`);
+console.log(`northeast: ${calculateAzimuth(home, northeast)}`);
+console.log(`east: ${calculateAzimuth(home, east)}`);
+console.log(`southeast: ${calculateAzimuth(home, southeast)}`);
+console.log(`south: ${calculateAzimuth(home, south)}`);
+console.log(`southwest: ${calculateAzimuth(home, southwest)}`);
+console.log(`west: ${calculateAzimuth(home, west)}`);
+console.log(`northwest: ${calculateAzimuth(home, northwest)}`);
 
-console.log(`Rads: ${rads}; degs: ${degs}`);
+function calculateAzimuth(point1, point2) {
+    // Math.* takes radians
+    const φ1 = point1[0] * degToRad;
+    const λ1 = point1[1] * degToRad;
+    const φ2 = point2[0] * degToRad;
+    const λ2 = point2[1] * degToRad;
+    const Δλ = λ2 - λ1;
+
+    const rads = Math.atan2(Math.sin(Δλ)*Math.cos(φ2), 
+        Math.cos(φ1)*Math.sin(φ2) - Math.sin(φ1)*Math.cos(φ2)*Math.cos(Δλ));    
+    const degs = rads * radToDeg;
+
+    return (degs + 360) % 360;
+}
