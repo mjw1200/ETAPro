@@ -1,3 +1,5 @@
+// https://www.omnicalculator.com/other/azimuth#azimuth-formula
+
 // N: 0°
 // NNE: 22.5°
 // NE: 45°
