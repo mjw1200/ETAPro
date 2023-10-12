@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:etapro_flutter/location.dart';
 import 'package:etapro_flutter/speed.dart';
 import 'package:flutter/material.dart';
 
@@ -14,10 +15,14 @@ class SummaryState extends State<Summary> {
   static const int updateInterval = 30000; // ms
   Speed speed = Speed(updateInterval);
   var mpsSpeed = -2;
+  Location location = Location();
 
   SummaryState() : super() {
     // +100: Make the display polling interval a skosh longer than the speed update interval
     Timer.periodic(const Duration(milliseconds: updateInterval + 100), getCurrentSpeed);
+    location.stream.listen((coords) {
+      print('Got an event! $coords');
+    });
   }
 
   @override
