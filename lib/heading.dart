@@ -1,50 +1,71 @@
 import 'dart:typed_data';
 import 'dart:math';
 
-enum Azimuth { none, north, northEast, east, southeast, south, southwest, west, northwest }
+import 'package:etapro_flutter/azimuth.dart';
+import 'package:etapro_flutter/logger.dart';
 
 class Heading {
-  Float64List? _current; // [0] is latitude (φ), [1] is longitude (λ)
-  Float64List? _last;
-  Azimuth _lastAzimuth = Azimuth.none;
+  Float64List? _currentLocation; // [0] is latitude (φ), [1] is longitude (λ)
+  Float64List? _lastLocation;
+  Azimuth _currentAzimuth = Azimuth.none;
+  Azimuth _previousAzimuth = Azimuth.none;
+  static const _className = 'Speed';
+  Logger logger = Logger();
 
   final degToRad = pi / 180;
   final radToDeg = 180 / pi;
 
-  bool azimuthChange(double lat, double lon) {
-    bool verdict = false;
+  // ----------------------------------------------------------------------------------------------
+  // ...
+  void newCoordinates(Float64List coords) {
+    const String functionName = '$_className.newCoordinates';
+    logger.log('$functionName: Start. $coords');
 
-    // 1. Move _current to _last; set _current
-    _set(lat, lon);
+    _lastLocation = _currentLocation;
+    _currentLocation = coords;
+    _calculate();
 
-    // 2. Calculate the azimuth from _last and _current
-    var newAzimuth = _calculate();
-
-    // 3. Compare it to the last known heading
-    // 4. Return true if different; false if the same
-    if (newAzimuth == Azimuth.none || newAzimuth != _lastAzimuth) {
-      verdict = true;
-    }
-
-    _lastAzimuth = newAzimuth;
-
-    return verdict;
+    logger.log('$functionName: End.');
   }
 
-  void _set(double lat, double lon) {
-    _last = _current;
-    _current = Float64List.fromList([lat, lon]);
-  }
+  // ----------------------------------------------------------------------------------------------
+  // ...
+  bool changeInAzimuth() {
+    const String functionName = '$_className.changeInAzimuth';
+    logger.log('$functionName: Start.');
 
-  Azimuth _calculate() {
-    if (_last == null || _current == null) {
-      return Azimuth.none;
+    var change = false;
+
+    if (_currentAzimuth == Azimuth.none || _previousAzimuth == Azimuth.none || _currentAzimuth != _previousAzimuth) {
+      logger.log('$functionName: Reporting change $_previousAzimuth --> $_currentAzimuth');
+      change = true;
     }
 
-    final t1 = _last![0] * degToRad; // this would be φ1, except I can't use Greek letters
-    final l1 = _last![1] * degToRad; // this would be λ1, except...
-    final t2 = _current![0] * degToRad;
-    final l2 = _current![1] * degToRad;
+    logger.log('$functionName: End.');
+    return change;
+  }
+
+  // ----------------------------------------------------------------------------------------------
+  // ...
+  Azimuth currentAzimuth() {
+    const String functionName = '$_className.changeInAzimuth';
+    logger.log('$functionName: Start. $_currentAzimuth');
+    logger.log('$functionName: End.');
+
+    return _currentAzimuth;
+  }
+
+  // ----------------------------------------------------------------------------------------------
+  // See https://www.omnicalculator.com/other/azimuth#azimuth-formula
+  void _calculate() {
+    if (_lastLocation == null || _currentLocation == null) {
+      return;
+    }
+
+    final t1 = _lastLocation![0] * degToRad; // this would be φ1, except I can't use Greek letters
+    final l1 = _lastLocation![1] * degToRad; // this would be λ1, except...
+    final t2 = _currentLocation![0] * degToRad;
+    final l2 = _currentLocation![1] * degToRad;
     final dl = l2 - l1; // this would be Δλ, except...
 
     final radians = atan2(sin(dl) * cos(t2), cos(t1) * sin(t2) - sin(t1) * cos(t2) * cos(dl));
@@ -59,22 +80,24 @@ class Heading {
     // West	247.5	292.5
     // Northwest	292.5	337.5
 
+    _previousAzimuth = _currentAzimuth;
+
     if (degrees > 337.5 && degrees < 22.5) {
-      return Azimuth.north;
+      _currentAzimuth = Azimuth.north;
     } else if (degrees > 22.5 && degrees < 67.5) {
-      return Azimuth.northEast;
+      _currentAzimuth = Azimuth.northEast;
     } else if (degrees > 67.5 && degrees < 112.5) {
-      return Azimuth.east;
+      _currentAzimuth = Azimuth.east;
     } else if (degrees > 112.5 && degrees < 157.5) {
-      return Azimuth.southeast;
+      _currentAzimuth = Azimuth.southeast;
     } else if (degrees > 157.5 && degrees < 202.5) {
-      return Azimuth.south;
+      _currentAzimuth = Azimuth.south;
     } else if (degrees > 202.5 && degrees < 247.5) {
-      return Azimuth.southwest;
+      _currentAzimuth = Azimuth.southwest;
     } else if (degrees > 247.5 && degrees < 292.5) {
-      return Azimuth.west;
+      _currentAzimuth = Azimuth.west;
     } else {
-      return Azimuth.northwest;
+      _currentAzimuth = Azimuth.northwest;
     }
   }
 }
