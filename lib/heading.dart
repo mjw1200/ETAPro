@@ -9,7 +9,7 @@ class Heading {
   Float64List? _lastLocation;
   Azimuth _currentAzimuth = Azimuth.none;
   Azimuth _previousAzimuth = Azimuth.none;
-  static const _className = 'Speed';
+  static const _className = 'Heading';
   Logger logger = Logger();
 
   final degToRad = pi / 180;
@@ -58,6 +58,9 @@ class Heading {
   // ----------------------------------------------------------------------------------------------
   // See https://www.omnicalculator.com/other/azimuth#azimuth-formula
   void _calculate() {
+    const String functionName = '$_className._calculate';
+    logger.log('$functionName: Start.');
+
     if (_lastLocation == null || _currentLocation == null) {
       return;
     }
@@ -99,5 +102,8 @@ class Heading {
     } else {
       _currentAzimuth = Azimuth.northwest;
     }
+
+    logger
+        .log('$functionName: End. Calculated new azimuth of $_currentAzimuth from $_lastLocation to $_currentLocation');
   }
 }

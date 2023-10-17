@@ -39,14 +39,14 @@ class SummaryState extends State<Summary> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text(
-          '$_mpsSpeed m/s',
-          style: style,
-        ),
-        Text(
-          '$mphSpeed mph',
-          style: style,
-        ),
+        // Text(
+        //   '$_mpsSpeed m/s',
+        //   style: style,
+        // ),
+        // Text(
+        //   '$mphSpeed mph',
+        //   style: style,
+        // ),
         Text(
           'Heading: $_azimuth',
           style: style,
