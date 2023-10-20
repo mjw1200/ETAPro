@@ -1,1 +1,1 @@
-enum Azimuth { none, north, northEast, east, southeast, south, southwest, west, northwest }
+enum Azimuth { none, invalid, north, northEast, east, southeast, south, southwest, west, northwest }

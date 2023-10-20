@@ -64,7 +64,7 @@ class Speed {
       // 45 m/s is 100.662 mph. Unlikely, in a standard car.
       _currentSpeed = speed.round();
     } else {
-      logger.log('$functionName: Speed seems silly. Ignoring');
+      logger.log('$functionName: Speed seems silly; ignoring.');
     }
 
     _lastUpdateTime = now;

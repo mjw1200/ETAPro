@@ -23,7 +23,13 @@ class Heading {
 
     _lastLocation = _currentLocation;
     _currentLocation = coords;
-    _calculate();
+    if (_lastLocation?[0] == _currentLocation?[0] && _lastLocation?[1] == _currentLocation?[1]) {
+      // TODO: Maybe this is where the "minimum distance" criteria should come in, rather than
+      // comparing the two locations for equality?
+      logger.log('$functionName: Samesies: $_lastLocation; $_currentLocation. Skipping calculation.');
+    } else {
+      _calculate();
+    }
 
     logger.log('$functionName: End.');
   }
@@ -85,22 +91,27 @@ class Heading {
 
     _previousAzimuth = _currentAzimuth;
 
-    if (degrees > 337.5 && degrees < 22.5) {
+    if (degrees > 337.5 || degrees <= 22.5) {
+      // Most of these conditions are &&. This one is || because azimuths wrap at > 359.9
       _currentAzimuth = Azimuth.north;
-    } else if (degrees > 22.5 && degrees < 67.5) {
+    } else if (degrees > 22.5 && degrees <= 67.5) {
       _currentAzimuth = Azimuth.northEast;
-    } else if (degrees > 67.5 && degrees < 112.5) {
+    } else if (degrees > 67.5 && degrees <= 112.5) {
       _currentAzimuth = Azimuth.east;
-    } else if (degrees > 112.5 && degrees < 157.5) {
+    } else if (degrees > 112.5 && degrees <= 157.5) {
       _currentAzimuth = Azimuth.southeast;
-    } else if (degrees > 157.5 && degrees < 202.5) {
+    } else if (degrees > 157.5 && degrees <= 202.5) {
       _currentAzimuth = Azimuth.south;
-    } else if (degrees > 202.5 && degrees < 247.5) {
+    } else if (degrees > 202.5 && degrees <= 247.5) {
       _currentAzimuth = Azimuth.southwest;
-    } else if (degrees > 247.5 && degrees < 292.5) {
+    } else if (degrees > 247.5 && degrees <= 292.5) {
       _currentAzimuth = Azimuth.west;
-    } else {
+    } else if (degrees > 292.5 && degrees <= 337.5) {
       _currentAzimuth = Azimuth.northwest;
+    } else {
+      // This "shouldn't" happen...
+      logger.log('$functionName: Degrees is $degrees; azimuth invalid');
+      _currentAzimuth = Azimuth.invalid;
     }
 
     logger
