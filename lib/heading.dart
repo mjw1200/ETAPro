@@ -92,7 +92,8 @@ class Heading {
     _previousAzimuth = _currentAzimuth;
 
     if (degrees > 337.5 || degrees <= 22.5) {
-      // Most of these conditions are &&. This one is || because azimuths wrap at > 359.9
+      // Most of these conditions are &&. This one is || because azimuth wraps
+      // when it hits 360
       _currentAzimuth = Azimuth.north;
     } else if (degrees > 22.5 && degrees <= 67.5) {
       _currentAzimuth = Azimuth.northEast;

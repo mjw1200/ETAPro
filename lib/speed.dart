@@ -51,7 +51,7 @@ class Speed {
     var distance = _haversine(_previousLocation!, _currentLocation!);
 
     var now = Time().secondsSinceEpoch();
-    var elapsedTime = now - _lastUpdateTime;
+    var elapsedTime = now.toDouble() - _lastUpdateTime;
     var speed = distance / elapsedTime;
 
     logger.log('$functionName: from ${_previousLocation![0]},${_previousLocation![1]}');
@@ -67,7 +67,7 @@ class Speed {
       logger.log('$functionName: Speed seems silly; ignoring.');
     }
 
-    _lastUpdateTime = now;
+    _lastUpdateTime = now.toDouble();
 
     logger.log('$functionName: End');
   }

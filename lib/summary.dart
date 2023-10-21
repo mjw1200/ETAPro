@@ -16,8 +16,8 @@ class Summary extends StatefulWidget {
 }
 
 class SummaryState extends State<Summary> {
-  static const int updateInterval = 30000; // ms
-  // var _mpsSpeed = -1;
+  static const int updateInterval = 60000; // ms
+  var _mpsSpeed = -1;
   Location location = Location();
   Heading heading = Heading();
   Speed speed = Speed();
@@ -50,7 +50,7 @@ class SummaryState extends State<Summary> {
   @override
   Widget build(BuildContext context) {
     const TextStyle style = TextStyle(fontSize: 24, fontFamily: 'Adlam');
-    // final mphSpeed = (_mpsSpeed * 2.23694).round();
+    final mphSpeed = (_mpsSpeed * 2.23694).round();
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -59,10 +59,10 @@ class SummaryState extends State<Summary> {
         //   '$_mpsSpeed m/s',
         //   style: style,
         // ),
-        // Text(
-        //   '$mphSpeed mph',
-        //   style: style,
-        // ),
+        Text(
+          '$mphSpeed mph',
+          style: style,
+        ),
         Text(
           'Heading: $_azimuth',
           style: style,
@@ -73,11 +73,11 @@ class SummaryState extends State<Summary> {
 
   void getCurrentSpeed(Timer t) async {
     setState(() {
-      if (heading.changeInAzimuth()) {
-        _azimuth = heading.currentAzimuth();
-      } // else {
-      //   _mpsSpeed = speed.getCurrentSpeed();
-      // }
+      _azimuth = heading.currentAzimuth();
+
+      if (!heading.changeInAzimuth()) {
+        _mpsSpeed = speed.getCurrentSpeed();
+      }
     });
   }
 }

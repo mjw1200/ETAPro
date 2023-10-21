@@ -1,5 +1,6 @@
 class Time {
-  double secondsSinceEpoch() {
-    return DateTime.now().millisecondsSinceEpoch / Duration.millisecondsPerSecond;
+  int secondsSinceEpoch() {
+    double t = DateTime.now().millisecondsSinceEpoch / Duration.millisecondsPerSecond;
+    return t.round();
   }
 }

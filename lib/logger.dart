@@ -19,7 +19,7 @@ class Logger {
   late String _logFileName;
 
   void log(String message) {
-    File(_logFileName).writeAsStringSync('$message\n', mode: FileMode.append);
+    File(_logFileName).writeAsStringSync('${Time().secondsSinceEpoch()} $message\n', mode: FileMode.append);
   }
 
   void _setLogFileName(Directory dir) {
