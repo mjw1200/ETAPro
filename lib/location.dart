@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 
-const int secondsInterval = 10;
+const int secondsInterval = 120;
 
 class Location {
   Float64List _currentLocation = Float64List.fromList([0.0, 0.0]); // [0] is latitude, [1] is longitude

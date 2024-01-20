@@ -16,7 +16,7 @@ class Summary extends StatefulWidget {
 }
 
 class SummaryState extends State<Summary> {
-  static const int updateInterval = 60000; // ms
+  static const int updateInterval = 120000; // ms
   var _mpsSpeed = -1;
   Location location = Location();
   Heading heading = Heading();
