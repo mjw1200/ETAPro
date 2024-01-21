@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------------------------------
 // reference_pins.js
 //
-// Illustrates the basic algorithm I have in mind for the "reference pins" approach, where drive
-// pins are coerced to reference pins with a known good lat/lon value.
+// Illustrates the basic algorithm I have in mind for the "reference pins" approach, where a
+// drive pin is coerced to a reference pin with a known good lat/lon value.
 
 const fs = require('node:fs');
 
@@ -15,25 +15,31 @@ read_input('./drive_pins.txt', drive_pins);
 // lon: reference_pins[i][1]
 
 var drive_pin_index = 1;
+var min_found = false;
 
-drive_pins.forEach(drive_pin => {
-    var min_dist = Number.MAX_VALUE;
-    var reference_pin_index = 0;
+for (var i = 0; i < drive_pins.length; i++) {
     var reference_pin_min_index = -1;
-    
-    reference_pins.forEach(reference_pin => {
-        const dist = haversine(drive_pin[0], drive_pin[1], reference_pin[0], reference_pin[1]);
+    var reference_pin_index = 1;
+    var min_dist = Number.MAX_VALUE;
+
+    for (var j = 0; j < reference_pins.length; j++) {
+        const dist = haversine(drive_pins[i][0], drive_pins[i][1], reference_pins[j][0], reference_pins[j][1]);
         if (dist < min_dist) {
-            min_dist = dist;
             reference_pin_min_index = reference_pin_index;
+            min_dist = dist;
+        }
+        else {
+            console.log(`Min dist ${min_dist}, ${reference_pin_index}/${reference_pins.length}`);
+            min_found = true;
+            break;
         }
 
         reference_pin_index++;
-    })
+    }
 
-    console.log(`Drive pin ${drive_pin_index} is closest to reference pin ${reference_pin_min_index} with a distance of ${min_dist}m`);
+    console.log(`Drive pin ${drive_pin_index} coerced to reference pin ${reference_pin_min_index} at ${min_dist}m`);
     drive_pin_index++;    
-})
+}
 
 //------------------------------------------------------------------------------------------------
 function haversine(lat1, lon1, lat2, lon2) {
