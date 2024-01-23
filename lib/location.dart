@@ -3,9 +3,10 @@ import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 
-const int secondsInterval = 120;
+const int secondsInterval = 10;
 
 class Location {
+  // ignore: unused_field
   Float64List _currentLocation = Float64List.fromList([0.0, 0.0]); // [0] is latitude, [1] is longitude
   final _platform = const MethodChannel('native_gps');
   late Stream<Float64List> stream;
@@ -17,5 +18,9 @@ class Location {
 
   void _updateCoords(Timer t) async {
     _platform.invokeMethod('getCurrentLocation').then((value) => {_currentLocation = value});
+  }
+
+  Future<dynamic> GetCoords() {
+    return _platform.invokeMethod('getCurrentLocation');
   }
 }

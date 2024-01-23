@@ -1,3 +1,4 @@
+import 'dart:core';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
@@ -16,10 +17,12 @@ class Logger {
 
   // ----------------------------------------------------------------------------------------------
   // Just class things
-  late String _logFileName;
+  String? _logFileName;
 
   void log(String message) {
-    File(_logFileName).writeAsStringSync('${Time().secondsSinceEpoch()} $message\n', mode: FileMode.append);
+    if (_logFileName != null) {
+      File(_logFileName!).writeAsStringSync('${Time().secondsSinceEpoch()} $message\n', mode: FileMode.append);
+    }
   }
 
   void _setLogFileName(Directory dir) {

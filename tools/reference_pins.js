@@ -16,6 +16,7 @@ read_input('./drive_pins.txt', drive_pins);
 
 var drive_pin_index = 1;
 var min_found = false;
+var last_pin = null;
 
 for (var i = 0; i < drive_pins.length; i++) {
     var reference_pin_min_index = -1;
@@ -37,8 +38,20 @@ for (var i = 0; i < drive_pins.length; i++) {
         reference_pin_index++;
     }
 
-    console.log(`Drive pin ${drive_pin_index} coerced to reference pin ${reference_pin_min_index} at ${min_dist}m`);
+    console.log(`Drive pin ${drive_pin_index} ${drive_pins[drive_pin_index-1]} coerced to reference pin ${reference_pin_min_index} ${reference_pins[reference_pin_min_index-1]} at ${min_dist}m`);
+    if (last_pin) {
+        qndSpeed(last_pin, reference_pins[reference_pin_min_index-1]);
+    }
+    last_pin = reference_pins[reference_pin_min_index-1];
     drive_pin_index++;    
+}
+
+//------------------------------------------------------------------------------------------------
+function qndSpeed(last_pin, this_pin) {
+    const dist = haversine(last_pin[0], last_pin[1], this_pin[0], this_pin[1]);
+    const speed = dist/10; 
+
+    console.log(`From ${last_pin} to ${this_pin} was ${dist} at ${speed}`);
 }
 
 //------------------------------------------------------------------------------------------------
