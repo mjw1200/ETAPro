@@ -1,3 +1,5 @@
+// ignore_for_file: sort_child_properties_last, prefer_const_constructors
+
 import 'package:etapro_flutter/summary.dart';
 import 'package:etapro_flutter/no_permission.dart';
 import 'package:flutter/material.dart';
@@ -60,21 +62,58 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _isStarted = false;
+
   @override
   Widget build(BuildContext context) {
-    Widget theWidget = super.widget.permissions ? const Summary() : const NoPermission(message: 'No Permissions');
+    String status = _isStarted ? 'Running' : 'Stopped';
+    const TextStyle style = TextStyle(fontSize: 20, fontFamily: 'Adlam');
+    Widget theWidget = super.widget.permissions
+        ? Text(
+            status,
+            style: style,
+          )
+        : const NoPermission(message: 'No Permissions');
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[theWidget],
-        ),
-      ),
-    );
+    const String appTitle = 'ETAPro';
+    return MaterialApp(
+        title: appTitle,
+        home: Scaffold(
+          appBar: AppBar(
+            title: const Text(appTitle),
+          ),
+          body: Center(
+              child: Column(children: [
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              Container(
+                  margin: EdgeInsets.all(16.0),
+                  child: IconButton(
+                      iconSize: 32.0,
+                      onPressed: _handleStartPress,
+                      icon: Icon(
+                        Icons.start,
+                        color: Colors.green,
+                      ))),
+              Container(
+                  margin: EdgeInsets.all(16.0),
+                  child: IconButton(
+                      iconSize: 32.0, onPressed: _handleStopPress, icon: Icon(Icons.stop, color: Colors.red)))
+            ]),
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              Container(color: Colors.green, child: TextField(controller: TextEditingController(text: '15')))
+            ]),
+            Row(mainAxisSize: MainAxisSize.min, children: [Container(margin: EdgeInsets.all(18.0), child: theWidget)])
+          ], mainAxisSize: MainAxisSize.min)),
+        ));
+  }
+
+  void _handleStopPress() {
+    _isStarted = false;
+    setState(() {});
+  }
+
+  void _handleStartPress() {
+    _isStarted = true;
+    setState(() {});
   }
 }
