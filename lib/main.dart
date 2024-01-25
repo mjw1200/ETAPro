@@ -62,6 +62,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _startEnabled = false;
   bool _isStarted = false;
 
   @override
@@ -86,35 +87,43 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Column(children: [
             Row(mainAxisSize: MainAxisSize.min, children: [
               Container(
-                  margin: EdgeInsets.all(16.0),
+                  margin: EdgeInsets.all(32.0),
                   child: IconButton(
-                      iconSize: 32.0,
-                      onPressed: _handleStartPress,
+                      iconSize: 64.0,
+                      onPressed: _startEnabled ? _handleStartPress : null,
                       icon: Icon(
                         Icons.start,
-                        color: Colors.green,
+                        color: _startEnabled ? Colors.green : Colors.grey,
                       ))),
               Container(
-                  margin: EdgeInsets.all(16.0),
+                  margin: EdgeInsets.all(32.0),
                   child: IconButton(
-                      iconSize: 32.0, onPressed: _handleStopPress, icon: Icon(Icons.stop, color: Colors.red)))
+                      iconSize: 64.0,
+                      onPressed: _startEnabled ? null : _handleStopPress,
+                      icon: Icon(Icons.stop, color: _startEnabled ? Colors.grey : Colors.red)))
             ]),
             Row(mainAxisSize: MainAxisSize.min, children: [
               Container(
-                  child:
-                      SizedBox(width: 50, height: 25, child: TextField(controller: TextEditingController(text: '15'))))
+                  margin: EdgeInsets.all(32.0),
+                  child: SizedBox(
+                      width: 50,
+                      height: 25,
+                      child: TextField(
+                          textAlign: TextAlign.center, style: style, controller: TextEditingController(text: '999'))))
             ]),
-            Row(mainAxisSize: MainAxisSize.min, children: [Container(margin: EdgeInsets.all(18.0), child: theWidget)])
+            Row(mainAxisSize: MainAxisSize.min, children: [Container(margin: EdgeInsets.all(32.0), child: theWidget)])
           ], mainAxisSize: MainAxisSize.min)),
         ));
   }
 
   void _handleStopPress() {
+    _startEnabled = true;
     _isStarted = false;
     setState(() {});
   }
 
   void _handleStartPress() {
+    _startEnabled = false;
     _isStarted = true;
     setState(() {});
   }
