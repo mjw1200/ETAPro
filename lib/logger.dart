@@ -8,11 +8,16 @@ class Logger {
   // ----------------------------------------------------------------------------------------------
   // Logger is a singleton
   static final Logger _singleton = Logger._internal();
-  factory Logger() {
+  Directory? _directory;
+  factory Logger({bool newLogFile = false}) {
+    if (newLogFile) {
+      _singleton._setLogFileName();
+    }
+
     return _singleton;
   }
   Logger._internal() {
-    getApplicationDocumentsDirectory().then((value) => {_setLogFileName(value)});
+    getApplicationDocumentsDirectory().then((value) => {_directory = value, _setLogFileName()});
   }
 
   // ----------------------------------------------------------------------------------------------
@@ -25,8 +30,10 @@ class Logger {
     }
   }
 
-  void _setLogFileName(Directory dir) {
-    var tZero = Time().secondsSinceEpoch();
-    _logFileName = '${dir.path}/etapro_debug_$tZero.txt';
+  void _setLogFileName() {
+    if (_directory != null) {
+      var tZero = Time().secondsSinceEpoch();
+      _logFileName = '${_directory!.path}/etapro_debug_$tZero.txt';
+    }
   }
 }

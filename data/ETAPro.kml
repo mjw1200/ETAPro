@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document id="1ldMPPBL6Lj9UojW1mtnn3w76Q-dtJANy">
+	<name>ETAPro</name>
+	<Placemark>
+		<name>337 to 333</name>
+		<LookAt>
+			<longitude>-110.5984336902841</longitude>
+			<latitude>45.65309318576413</latitude>
+			<altitude>1401.78088733034</altitude>
+			<heading>0</heading>
+			<tilt>0</tilt>
+			<gx:fovy>30</gx:fovy>
+			<range>297.5291046614075</range>
+			<altitudeMode>absolute</altitudeMode>
+		</LookAt>
+		<styleUrl>#__managed_style_0E02573A1E2E6CD717EE</styleUrl>
+		<LineString>
+			<coordinates>
+				-110.5034346,45.6871301,0 -110.5050691,45.6848958,0 -110.507348,45.6829945,0 -110.5117145,45.679008,0 -110.514516,45.6765875,0 -110.5168723,45.6742817,0 -110.5197562,45.6716898,0 -110.5227777,45.668773,0 -110.5279715,45.6641543,0 -110.530874,45.6615612,0 -110.5338027,45.6588133,0 -110.5369712,45.6560327,0 -110.5397905,45.6540041,0 -110.5454721,45.6499501,0 -110.5485582,45.6479152,0 -110.552467,45.6456544,0 -110.5560585,45.6445871,0 -110.5611144,45.6445255,0
+			</coordinates>
+		</LineString>
+	</Placemark>
+	<Placemark>
+		<name>9th n Park to Vet</name>
+		<LookAt>
+			<longitude>-110.5984336902841</longitude>
+			<latitude>45.65309318576413</latitude>
+			<altitude>1401.78088733034</altitude>
+			<heading>0</heading>
+			<tilt>0</tilt>
+			<gx:fovy>30</gx:fovy>
+			<range>297.5291046614075</range>
+			<altitudeMode>absolute</altitudeMode>
+		</LookAt>
+		<styleUrl>#__managed_style_0E02573A1E2E6CD717EE</styleUrl>
+		<LineString>
+			<coordinates>
+				-110.5677903,45.6585013,0 -110.5659134,45.6598172,0 -110.5659064,45.6598063,0 -110.564638,45.6605225,0 -110.5624776,45.6616055,0 -110.5624776,45.6616055,0 -110.5600036,45.6628338,0 -110.5578461,45.6639046,0 -110.5556444,45.6651099,0 -110.5540408,45.6661956,0 -110.5525523,45.6668929,0 -110.5501797,45.6681921,0 -110.5476979,45.6693954,0 -110.5463469,45.6700645,0 -110.5428836,45.6722619,0 -110.541153,45.6731863,0 -110.5362672,45.6750487,0 -110.5334458,45.6761242,0 -110.5298709,45.6775822,0 -110.5251738,45.6793284,0 -110.5221176,45.6805719,0 -110.5193441,45.6816104,0
+			</coordinates>
+		</LineString>
+	</Placemark>
+</Document>
+</kml>

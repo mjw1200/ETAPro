@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class Interval extends StatelessWidget {
   Interval({super.key});
 
-  final tec = TextEditingController(text: '999');
+  final tec = TextEditingController(text: '15');
 
   @override
   Widget build(BuildContext context) {
@@ -18,10 +18,6 @@ class Interval extends StatelessWidget {
                   style: const TextStyle(fontSize: 20, fontFamily: 'Adlam'),
                   controller: tec)))
     ]);
-  }
-
-  getIntervalInSeconds() {
-    return int.parse(tec.text);
   }
 }
 
