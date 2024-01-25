@@ -100,7 +100,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       iconSize: 32.0, onPressed: _handleStopPress, icon: Icon(Icons.stop, color: Colors.red)))
             ]),
             Row(mainAxisSize: MainAxisSize.min, children: [
-              Container(color: Colors.green, child: TextField(controller: TextEditingController(text: '15')))
+              Container(
+                  child:
+                      SizedBox(width: 50, height: 25, child: TextField(controller: TextEditingController(text: '15'))))
             ]),
             Row(mainAxisSize: MainAxisSize.min, children: [Container(margin: EdgeInsets.all(18.0), child: theWidget)])
           ], mainAxisSize: MainAxisSize.min)),
