@@ -1,10 +1,9 @@
-// ignore_for_file: sort_child_properties_last, prefer_const_constructors
-
-import 'package:etapro_flutter/summary.dart';
-import 'package:etapro_flutter/no_permission.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:io' show Platform;
+import 'package:etapro_flutter/startstop.dart';
+import 'package:etapro_flutter/interval.dart' as etapro_interval;
+import 'package:etapro_flutter/status.dart';
 
 void main() {
   ensurePermissions().then((value) => {runApp(MyApp(permissions: value))});
@@ -40,18 +39,18 @@ class MyApp extends StatelessWidget {
       title: 'ETAPro_Flutter',
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple), useMaterial3: true),
       home: MyHomePage(
-        title: 'ETAPro',
         permissions: permissions,
+        title: 'ETAPro',
       ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title, required this.permissions});
+  const MyHomePage({super.key, required this.permissions, required this.title});
 
-  final String title;
   final bool permissions;
+  final String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -62,19 +61,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool _startEnabled = false;
-  bool _isStarted = false;
+  bool _running = false;
 
   @override
   Widget build(BuildContext context) {
-    String status = _isStarted ? 'Running' : 'Stopped';
-    const TextStyle style = TextStyle(fontSize: 20, fontFamily: 'Adlam');
-    Widget theWidget = super.widget.permissions
-        ? Text(
-            status,
-            style: style,
-          )
-        : const NoPermission(message: 'No Permissions');
+    var startStop = StartStop(toggleStateFunction: _toggleState, running: _running);
+    var interval = etapro_interval.Interval();
+    String statusMessage = _running ? 'Running' : 'Stopped';
+    var status = Status(message: statusMessage);
 
     const String appTitle = 'ETAPro';
     return MaterialApp(
@@ -83,48 +77,13 @@ class _MyHomePageState extends State<MyHomePage> {
           appBar: AppBar(
             title: const Text(appTitle),
           ),
-          body: Center(
-              child: Column(children: [
-            Row(mainAxisSize: MainAxisSize.min, children: [
-              Container(
-                  margin: EdgeInsets.all(32.0),
-                  child: IconButton(
-                      iconSize: 64.0,
-                      onPressed: _startEnabled ? _handleStartPress : null,
-                      icon: Icon(
-                        Icons.start,
-                        color: _startEnabled ? Colors.green : Colors.grey,
-                      ))),
-              Container(
-                  margin: EdgeInsets.all(32.0),
-                  child: IconButton(
-                      iconSize: 64.0,
-                      onPressed: _startEnabled ? null : _handleStopPress,
-                      icon: Icon(Icons.stop, color: _startEnabled ? Colors.grey : Colors.red)))
-            ]),
-            Row(mainAxisSize: MainAxisSize.min, children: [
-              Container(
-                  margin: EdgeInsets.all(32.0),
-                  child: SizedBox(
-                      width: 50,
-                      height: 25,
-                      child: TextField(
-                          textAlign: TextAlign.center, style: style, controller: TextEditingController(text: '999'))))
-            ]),
-            Row(mainAxisSize: MainAxisSize.min, children: [Container(margin: EdgeInsets.all(32.0), child: theWidget)])
-          ], mainAxisSize: MainAxisSize.min)),
+          body: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [startStop, interval, status])),
         ));
   }
 
-  void _handleStopPress() {
-    _startEnabled = true;
-    _isStarted = false;
-    setState(() {});
-  }
-
-  void _handleStartPress() {
-    _startEnabled = false;
-    _isStarted = true;
-    setState(() {});
+  void _toggleState() {
+    setState(() {
+      _running = !_running;
+    });
   }
 }
