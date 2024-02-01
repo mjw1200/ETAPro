@@ -9,7 +9,7 @@ class Status extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(mainAxisSize: MainAxisSize.min, children: [
       Container(
-          margin: const EdgeInsets.all(32.0),
+          margin: const EdgeInsets.all(16),
           child: Text(message, style: const TextStyle(fontSize: 20, fontFamily: 'Adlam')))
     ]);
   }

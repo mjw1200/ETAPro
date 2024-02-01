@@ -41,11 +41,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ETAPro_Flutter',
+      title: 'etapro_flutter',
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple), useMaterial3: true),
       home: MyHomePage(
         permissions: permissions,
-        title: 'ETAPro',
+        title: 'ETAPro Tool 1',
       ),
     );
   }
@@ -73,17 +73,17 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     var startStop = StartStop(toggleStateFunction: _toggleState, running: _running);
-    String statusMessage = _running ? 'Running' : 'Stopped';
-    var status = Status(message: statusMessage);
+    String statusMessage = _running ? 'running' : 'stopped';
+    var status = Status(message: 'Current status: $statusMessage');
 
-    const String appTitle = 'ETAPro';
+    const String appTitle = 'ETAPro Tool 1';
     return MaterialApp(
         title: appTitle,
         home: Scaffold(
           appBar: AppBar(
             title: const Text(appTitle),
           ),
-          body: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [startStop, interval, status])),
+          body: Center(child: Column(children: [startStop, interval, status])),
         ));
   }
 

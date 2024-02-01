@@ -17,7 +17,7 @@ class StartStop extends StatelessWidget {
   //------------------------------------------------------------------------------------------------------------------
   Container _containerizedIconButton(MaterialColor runningColor, MaterialColor stoppedColor, IconData icon) {
     return Container(
-        margin: const EdgeInsets.all(32.0),
+        margin: const EdgeInsets.only(left: 16, top: 0, right: 16, bottom: 16),
         child: IconButton(
             iconSize: 64.0,
             // This onPressed value is a little bit ugly, although it seems to work. I've tried to clean it up, but

@@ -3,20 +3,17 @@ import 'package:flutter/material.dart';
 class Interval extends StatelessWidget {
   Interval({super.key});
 
+  final textStyle = const TextStyle(fontSize: 20, fontFamily: 'Adlam');
   final tec = TextEditingController(text: '15');
 
   @override
   Widget build(BuildContext context) {
     return Row(mainAxisSize: MainAxisSize.min, children: [
+      Text('Sampling interval in seconds: ', style: textStyle),
       Container(
-          margin: const EdgeInsets.all(32.0),
+          margin: const EdgeInsets.all(16.0),
           child: SizedBox(
-              width: 50,
-              height: 25,
-              child: TextField(
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 20, fontFamily: 'Adlam'),
-                  controller: tec)))
+              width: 50, height: 25, child: TextField(textAlign: TextAlign.center, style: textStyle, controller: tec))),
     ]);
   }
 }
